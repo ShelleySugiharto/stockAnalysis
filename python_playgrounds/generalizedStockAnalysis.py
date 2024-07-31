@@ -15,6 +15,13 @@ note to self: research monte carlo usage in stock analysis, try to figure out MC
 import numpy as np
 import matplotlib.pyplot as plt
 
+#type hints
+def parser(file_name: str) -> list[np.array: int]:
+    return list[np.array: int]
+
+def importantVals(file_name: str, start_date: str, end_date: str) -> list[int]:
+    return list[int]
+
 
 #provide downloaded data
 fileName = input("Enter file name (not directory): ")
@@ -50,6 +57,7 @@ def parser(file_name):
 #NTS: value might be a tuple, so might have to change 
 def importantVals(file_name, startDate, endDate):
 
+    value: list[int] #value type hint
     fileDated = file_name[startDate, endDate]
 
     #user's desired value types
@@ -83,5 +91,6 @@ def importantVals(file_name, startDate, endDate):
         
         case _:
             print("Invalid option")
+            importantVals(file_name, startDate, endDate)
 
     
