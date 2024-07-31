@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 #type hints
 def parser(file_name: str) -> list[np.array: int]:
-    return list[np.array: int]
+    return list[np.array: int | str]
 
 def importantVals(file_name: str, start_date: str, end_date: str) -> list[int]:
     return list[int]
@@ -59,10 +59,14 @@ def importantVals(file_name, startDate, endDate):
 
     value: list[int] #value type hint
     fileDated = file_name[startDate, endDate]
+    
 
     #user's desired value types
     print("Value Types:", "1 - Median", "2 - Mean", "3 - Max", "4 - Min", "5 - Std Dev", "0 - All types")
-    value = input("Enter desired value type(s): ") #needs to be tuple/array of ints
+    value = input("Enter desired value type(s), space separated: ")
+    value = list(map(int, value.split())) # turns into a list of ints
+
+    #work in test file for the match case, switching to try except
 
     match value: #need to make it to where multiple inputs at once are read
         case 1:
