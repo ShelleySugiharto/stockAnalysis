@@ -16,8 +16,9 @@ def custom_get(*args, **kwargs):
 r.get = custom_get #replace with custom get
 
 #user input for period and ticker(s)
-print('Choose from 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max')
-period = input('Enter desired period:')
+
+start = input('Enter desired start date(YYYY-MM-DD):')
+end = input('Enter desired end date(YYYY-MM-DD):')
 tickerList = input('Enter ticker(s) separated by commas, no spaces:')
 
 #make ticker list string into list
@@ -39,10 +40,10 @@ session = CachedLimiterSession(
 
 #download data and assign ticker column for all tickers in tickerList
 try:
-    df = pd.concat([yf.Ticker(ticker).history(period=period).assign(
+    df = pd.concat([yf.Ticker(ticker).history(start=start, end=end).assign(
             ticker=ticker
             ) for ticker in tickerList], 
-            ignore_index=True) #removes dates, replaces w ints [0,i]
+            ignore_index=False) #removes dates, replaces w ints [0,i]
     
 except Exception as e:
     print(f"error dowloading data: {e}")
@@ -51,8 +52,6 @@ r.get = original_get #replace the original get to continue w yf
 
 #dictionary with tickers as keys, subcols (eg. 'Open', 'Close', etc.) as vals (list)
 d_ticker = {
-    ticker: gp.drop(columns='ticker').to_dict(orient='list') for ticker, 
+    ticker: gp.reset_index().drop(columns='ticker').to_dict(orient='list') for ticker, 
     gp in df.groupby('ticker')
 }
-
-print(d_ticker)
