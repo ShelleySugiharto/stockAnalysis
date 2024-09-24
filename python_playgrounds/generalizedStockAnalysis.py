@@ -1,57 +1,50 @@
-'''
-generalized parser for any stock info from yahoo finance
-divides data into 6 categories (in order):
-- opening price
-- daily high
-- daily low
-- closing price
-- adj closing price
-- daily volume
-
-note to self: research monte carlo usage in stock analysis, try to figure out MC from CRANE lec
-
-'''
-#import libraries
-import numpy as np
-import matplotlib.pyplot as plt
 import yfinance as yf
+import pandas as pd
+import requests as r
+from requests_cache import CacheMixin, SQLiteCache
+from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
+from pyrate_limiter import Duration, RequestRate, Limiter
 
-#type hints
-def parser(file_name: str) -> list[np.array: int]:
-    return list[np.array: int | str]
+#monkey patch the yfinance api for the custom get
 
-#provide downloaded data
-fileName = input("Enter file name (not directory): ")
+original_get = r.get #backup the original get from yf
 
+def custom_get(*args, **kwargs):
+    return session.get(*args, **kwargs)
 
-#note to self: need user intended start and end date, translate dates into array term (most efficient)
-#cont'd: by row, 0 = 1st date recorded,,, len(data) - 1 = last date recorded
-#cont'd: would mean dates would have to be read when parsed through because of differing 
-#start and end dates in user input data
+r.get = custom_get #replace with custom get
 
+#define vars
+period = '5d'
+tickerList = ["AMZN", "NTDOY"]
+ReqRate = [4,Duration.SECOND * 5]
 
-#function takes a file and parses through data, isolating into the 6 categories described in overall comment
-def parser(file_name):
-    data_Full = np.genfromtxt(file_name, delimiter = ',', skip_header = 0, 
-                  missing_values= 'nan', filling_values = 'dates')
+#creates cached sessions to ease amount of yahoo requests
+class CachedLimiterSession(CacheMixin, LimiterMixin, r.Session):
+    pass
+
+session = CachedLimiterSession(
+    limiter = Limiter(RequestRate(ReqRate[0], ReqRate[1])),
+    bucket_class = MemoryQueueBucket,
+    backend = SQLiteCache("yfinance.cache")
+)
+
+#download data and assign ticker column for all tickers in tickerList
+try:
+    df = pd.concat([yf.Ticker(ticker).history(period=period).assign(
+            ticker=ticker
+            ) for ticker in tickerList], 
+            ignore_index=True) #removes dates, replaces w ints [0,i]
     
-    data_Open = data_Full[:, 0]
-    data_High = data_Full[:, 1]
-    data_Low = data_Full[:, 2]
-    data_Close = data_Full[:, 3]
-    data_AdjClose = data_Full[:, 4]
-    data_Vol = data_Full[:, 5]
+except Exception as e:
+    print(f"error dowloading data: {e}")
 
-    return data_Full, data_Open, data_High, data_Low, data_Close, data_AdjClose, data_Vol
+r.get = original_get #replace the original get to continue w yf
 
-#auto-plot function: enter what you want plotted using different data sets
-def simplePlot(xvals, yvals, xlabel, ylabel, title):
-    plt.plot(xvals, yvals)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title)
-    plt.show()
+#dictionary with tickers as keys, subcols (eg. 'Open', 'Close', etc.) as vals (list)
+d_ticker = {
+    ticker: gp.drop(columns='ticker').to_dict(orient='list') for ticker, 
+    gp in df.groupby('ticker')
+}
 
-    
-
-
+print(d_ticker['AMZN']['Open'])
