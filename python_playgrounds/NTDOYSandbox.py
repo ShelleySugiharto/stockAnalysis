@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy as sp
 from scipy import optimize as opt
 
 '''
@@ -67,7 +68,7 @@ plt.ylabel("Daily Volume")
 plt.show()
 '''
 
-#test relation between different values
+'''#test relation between different values
 plt.subplot(2,2,1)
 plt.plot(NTDOY_Open, NTDOY_Close,'o', markersize = 1)
 plt.xlabel("Opening Prices")
@@ -93,7 +94,7 @@ plt.ylabel("Volume")
 plt.title("Opening Price VS Volume")
 
 plt.show()
-#use a disrt to fit data, don't know what, could just use gaussian for normal distr
+'''#use a disrt to fit data, don't know what, could just use gaussian for normal distr
 #gonnna use a gaussian, will just piece together different gaussians
 #or layover large scal, small scale gaussian bfs
 
@@ -102,4 +103,21 @@ def gaussian(a, x, x0, w):
     solution = a * np.exp(-(x - x0)**2/(2*w**2))
 
     return solution
+
+def linear(m, x, b):
+    solution = m*x + b
+    return solution
+
+
+bfpars_OC, covar_OC = opt.curve_fit(linear, NTDOY_Open, NTDOY_Close, p0 = [1,0])
+bfpars_HL, covar_HL = opt.curve_fit(linear, NTDOY_High, NTDOY_Low, p0 = [1,0])
+
+
+y_fitted = bfpars_HL[0]*NTDOY_High + bfpars_HL[1]
+
+plt.plot(NTDOY_High, y_fitted)
+plt.xlabel("High")
+plt.ylabel("Low")
+plt.title("High vs. Low (Fitted)")
+plt.show()
 
