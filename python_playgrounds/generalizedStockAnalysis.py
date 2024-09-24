@@ -14,14 +14,11 @@ note to self: research monte carlo usage in stock analysis, try to figure out MC
 #import libraries
 import numpy as np
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 #type hints
 def parser(file_name: str) -> list[np.array: int]:
     return list[np.array: int | str]
-
-def importantVals(file_name: str, start_date: str, end_date: str) -> list[int]:
-    return list[int]
-
 
 #provide downloaded data
 fileName = input("Enter file name (not directory): ")
@@ -31,9 +28,6 @@ fileName = input("Enter file name (not directory): ")
 #cont'd: by row, 0 = 1st date recorded,,, len(data) - 1 = last date recorded
 #cont'd: would mean dates would have to be read when parsed through because of differing 
 #start and end dates in user input data
-
-
-#call importantVals function using user input
 
 
 #function takes a file and parses through data, isolating into the 6 categories described in overall comment
@@ -50,51 +44,14 @@ def parser(file_name):
 
     return data_Full, data_Open, data_High, data_Low, data_Close, data_AdjClose, data_Vol
 
-
-#function takes file and finds its mean, median, max, min, and std deviation
-#note to self: implement finding above vals in a certain time interval
-#note to self: search up switch function in python -> might replace if elif body
-#NTS: value might be a tuple, so might have to change 
-def importantVals(file_name, startDate, endDate):
-
-    value: list[int] #value type hint
-    fileDated = file_name[startDate, endDate]
-    
-
-    #user's desired value types
-    print("Value Types:", "1 - Median", "2 - Mean", "3 - Max", "4 - Min", "5 - Std Dev", "0 - All types")
-    value = input("Enter desired value type(s), space separated: ")
-    value = list(map(int, value.split())) # turns into a list of ints
-
-    #work in test file for the match case, switching to try except
-
-    match value: #need to make it to where multiple inputs at once are read
-        case 1:
-            median = np.median(fileDated)
-            return median
-        
-        case 2:
-            mean = np.mean(fileDated)
-            return mean
-        
-        case 3:
-            maxVal = max(fileDated)
-            return maxVal
-        
-        case 4:
-            minVal = min(fileDated)
-            return minVal
-        
-        case 5:
-            stdDev = 0 #need to find std dev function np
-            return stdDev
-        
-        case 0:
-            allVals = [median, mean, maxVal, minVal, stdDev]
-            return allVals
-        
-        case _:
-            print("Invalid option")
-            importantVals(file_name, startDate, endDate)
+#auto-plot function: enter what you want plotted using different data sets
+def simplePlot(xvals, yvals, xlabel, ylabel, title):
+    plt.plot(xvals, yvals)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
 
     
+
+
