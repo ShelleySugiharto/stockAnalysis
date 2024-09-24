@@ -56,4 +56,3 @@ d_ticker = {
 }
 
 print(d_ticker)
-
