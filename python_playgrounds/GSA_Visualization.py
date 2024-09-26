@@ -1,6 +1,6 @@
 from generalizedStockAnalysis import d_ticker
 import matplotlib.pyplot as plt
-import pandas as pd
+
 
 #provide choice for plot axis designation
 print("a: Plot against time")
@@ -15,7 +15,6 @@ def plot_time():
     yvals = d_ticker[key_y][val_y]
     xvals = d_ticker[key_y]['Date']
 
-    plt.gcf().autofmt_xdate() #rotates dates for better readability
 
     plt.plot(xvals, yvals)
     plt.xlabel(f"{xvals[0]} - {xvals[len(xvals)-1]}")
